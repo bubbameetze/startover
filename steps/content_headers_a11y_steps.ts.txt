@@ -1,0 +1,646 @@
+import { browser, element, by, protractor } from 'protractor';
+import { Before, Given, Then } from 'cucumber';
+import {Scenario, TableDefinition} from 'cucumber';
+var {setDefaultTimeout} = require('cucumber');
+import { expect } from 'chai';
+import { KeyFields } from '../pages/keyfields_page_AN';
+import { KeyFields2 } from '../pages/keyfields2_page_AN';
+import { Homepage } from '../pages/homepage_page';
+import { config } from '../config/e2eRegression_config.js';
+import { Lookup } from '../pages/lookup_pages';
+import { generic_class } from '../utils/generic_classes';
+import { content_headers } from '../pages/content_headers_a11y';
+import { EmailCapture } from '../pages/emailCapture_pages';
+import { CentralPage } from '../pages/central_pages';
+import {Transforms} from '../pages/trans_pages_AS'
+import { Automations3 } from '../pages/auto3_pages_AN';
+import { Automations2 } from '../pages/auto2_pages_AN';
+import { Automations } from '../pages/auto_pages_AN';
+import { Imports } from '../pages/imports_pages_AN';
+import { Transforms2 } from '../pages/trans2_pages_AS';
+import { InappropriateSearch } from '../pages/Inappropriate_search_MK_pages';
+import { NullValues } from '../pages/nullValues_pages_AN';
+import { BrowserStack, DriverProvider } from 'protractor/built/driverProviders';
+let chai = require('chai')
+let expect = chai.expect;
+var {defineSupportCode} = require('cucumber');
+
+
+var fs = require('fs-extra');
+fs.emptyDir('screenshots/', function (err) {
+        console.log(err);
+    });
+
+let keyfields2: KeyFields2 = new KeyFields2();
+let trans2: Transforms2 = new Transforms2();
+let imports: Imports = new  Imports();
+let dateKey1=[], dateKey2=[], dateKey3=[]
+let auto3: Automations3 = new Automations3();
+let auto2: Automations2 = new Automations2();
+let auto: Automations = new Automations();
+let trans: Transforms = new Transforms();
+let central : CentralPage = new CentralPage ();
+let contentHeaders : content_headers = new content_headers();
+let keyfield : KeyFields = new KeyFields ();
+let homepage : Homepage = new Homepage ();
+let lookup : Lookup = new Lookup ();
+let helperFun: generic_class = new generic_class()
+let emCapture: EmailCapture = new EmailCapture();
+let textField1: string = null
+let inappropriateSearch: InappropriateSearch = new InappropriateSearch()
+let nulls: NullValues = new NullValues();
+
+let keyfieldname = {}, keys = [], doc={}, keylist = [], area={}, area1={}, importdoc = {}, importNewName={}, folder={}
+let keyfield1=[], keyfield2=[], docType1=[], docType2=[], automation=[]
+let docType=[];
+let docTypeName= {};
+let namesPrefix = '71984UnlinkIconFix';
+let dtBase = 'DocType';
+let areaBase = 'Area';
+
+Before({timeout: 60 * 1000}, function() {
+    setDefaultTimeout(60 * 1000);
+    });
+
+Given (/^User is able to go to Etrieve Content application$/, async function () {
+    browser.waitForAngularEnabled(false);
+    browser.get(config.baseUrl);
+    browser.sleep(1000)
+    const screenShot = await browser.takeScreenshot();
+    this.attach(screenShot, "image/png");
+    return browser.sleep(1000)
+});
+
+Then (/^User is able to login to the Etrieve Content$/, async function () {
+    browser.waitForAngularEnabled(false);
+    keyfield.contentLogin(config.params.login.user, config.params.login.pwd);
+    const screenShot = await browser.takeScreenshot();
+    this.attach(screenShot, "image/png");
+    return browser.sleep(1000)
+});
+
+Then (/^Click Configure icon gear on top right$/, async function ()  {
+    //homepage.clickMenu();
+    browser.get(config.baseUrl + 'Admin')
+    return browser.sleep(1000)
+});
+
+Then (/^Click Area link$/, async function ()  {
+    homepage.clickArea();
+    return browser.sleep(1000)
+});
+
+Then (/^Click on the New Area link$/, async function ()  {
+    homepage.clickNewArea();
+    return browser.sleep(1000)
+});
+
+Then (/^Create a New Area$/, async function ()  {
+    area = namesPrefix + areaBase + helperFun.randomDataGenerator()
+    console.log('New Area Created ---------------' + area)
+    homepage.newArea(area);
+    return browser.sleep(1000)
+});
+
+Then (/^Click the link for an newly created Area$/, async function ()  {
+    homepage.clickExistingArea(area);
+    browser.sleep(1000)
+    const screenShot = await browser.takeScreenshot();
+    this.attach(screenShot, "image/png");
+    return browser.sleep(1000)
+});
+
+Then (/^user expands Available Document Types section$/, async function (){
+    emCapture.clickOnAddDocTypeExpandButton();
+    return browser.sleep(1000);
+});
+
+Then (/^user clicks on Document Types section$/, async function (){   
+    emCapture.clickOnDocTypeSection();
+    return browser.sleep(1000);
+});
+
+Then (/^user enters a new doc type on New Document Type Name field$/, async function (){        
+    docTypeName = namesPrefix + dtBase + helperFun.randomDataGenerator();
+    emCapture.enterNewDocTypeName(docTypeName);
+    return browser.sleep(1000);
+});
+
+Then (/^user clicks on Add button to add new doc type$/, async function (){
+    emCapture.clickOnAddDocTypeButton();
+    return browser.sleep(1000);
+});
+
+Then (/^user clicks on Search field and searches for the newly created doc type$/, async function (){
+    emCapture.searchForDocType(docTypeName);
+    return browser.sleep(1000);
+});
+
+
+Then (/^Click on unfiled document$/, async () => {
+    keyfield.clickOnUnfiledDoc()
+    return browser.sleep(1000)
+});
+
+
+
+Then (/^User is able to create a document type to the area$/, async function ()  {
+    homepage.clickExistingArea(area);
+    browser.sleep(1000)
+    const screenShot = await browser.takeScreenshot();
+    this.attach(screenShot, "image/png");
+    return browser.sleep(1000)
+});
+
+Then (/^User is able to upload the file for Area$/, async function () {
+    browser.get(config.baseUrl);
+    central.annotationFile(area);
+    return browser.sleep(500);
+});
+
+
+
+
+
+
+Then (/^Go to the new Area which was created for area$/, async function ()  {
+    homepage.clickExistingArea(area);
+    browser.sleep(1000)
+    const screenShot = await browser.takeScreenshot();
+    this.attach(screenShot, "image/png");
+    return browser.sleep(1000)
+
+});
+
+Then (/^User collapses the inbox filter.$/, async function () {
+    element(by.xpath('//*[@id="inbox-filter-toggle"]')).click();
+});
+
+Then (/^User collapses the right panel.$/, async function () {
+    element(by.xpath('//*[@id="collapseRightPanelButton"]')).click();
+});
+
+Then (/^User selects the first unfiled document.$/, async () => {
+    contentHeaders.clickOnUnfiledDoc('1');
+    return browser.sleep(500)
+});
+
+Then (/^User clicks on the second unfiled document in the area.$/, async () => {
+    contentHeaders.clickOnUnfiledDoc('1');
+    return browser.sleep(1000)
+});
+
+Then (/^User clicks on the third unfiled document in the area.$/, async () => {
+    contentHeaders.clickOnUnfiledDoc('2');
+    return browser.sleep(1000)
+});
+
+Then (/^User clicks on the fourth unfiled document in the area.$/, async () => {
+    contentHeaders.clickOnUnfiledDoc('3');
+    return browser.sleep(1000)
+});
+
+Then (/^User clicks on the fifth unfiled document in the area.$/, async () => {
+    contentHeaders.clickOnUnfiledDoc('4');
+    return browser.sleep(1000)
+});
+
+
+
+Then (/^Click the start linking button on the bottom right$/, async () => {
+    browser.sleep(5000);
+    auto3.clickOnStartLinkingButton()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on the check button to link documents$/, async () => {
+    auto3.clickOnCheckButtonToLink()
+    return browser.sleep(1000)
+});
+
+
+Then (/^Click on the newly created area in the tree.$/, async function () {
+    trans.clickOnMyArea(area)
+    return browser.sleep(1000)
+});
+    
+Then (/^Click on the Links on the bottom right.$/, async () => {
+    auto3.clickOnLinks()
+    return browser.sleep(1000)
+});
+
+Then (/^Verify that all of the 3 unlink buttons have the css attributes margin 0px and padding 0px applied.$/, async function () {
+    browser.waitForAngular();
+    var a = element(by.xpath("//*[@id='linkedDocumentsSectionPartial']/div/div[1]"));
+    browser.actions().mouseMove(a).perform();
+    const screenShot = await browser.takeScreenshot();
+    this.attach(screenShot, "image/png");    
+    for(var i = 2;i<=4;i++) {
+        contentHeaders.checkUnlinkIconAlignment(i,'margin');
+        contentHeaders.checkUnlinkIconAlignment(i,'padding');
+    }
+    return browser.sleep(1000)
+});
+
+Then (/^Click the gear next to the Area Name and Delete the Area$/, async function ()  {
+    homepage.deleteArea();
+    browser.sleep(1000)
+    const screenShot = await browser.takeScreenshot();
+    this.attach(screenShot, "image/png");
+    return browser.sleep(1000)
+});
+
+Then (/^Click on the trash can on the top right$/, async () => {
+    keyfield.clickOnTrashBin()
+    return browser.sleep(500)
+});
+
+Then (/^Click on the x next to the recycle bin$/, async () => {
+    keyfield.deleteInRecycleBin()
+    return browser.sleep(1000)
+});
+
+Then (/^Click ok on the pop-up box$/, async () => {
+    keyfield.clickOnOkButton()
+    return browser.sleep(1000)
+});
+
+Then (/^User focus follows the clicked unfiled documents.$/, async function () {
+    var unfiledDocs = browser.driver.findElements(by.xpath('//*[@class="inbox__item interactive focus-dark" or @class="inbox__item interactive focus-dark selectedItem"]'));
+    (await unfiledDocs).forEach(processLis)
+        function processLis(instanceVal) 
+        {
+            //click on each list item element to select the unfiled document
+            instanceVal.click();
+            instanceVal.getAttribute('id').then(function(tagId) 
+            {
+                //Get the focus element parent (which has an id to check against.)
+                browser.driver.switchTo().activeElement().findElement(by.xpath('..')).getAttribute('id').then(function(focusId) {
+                    console.log('focus element (parent) id: ' + focusId + '\t clicked on element id:' + tagId);
+                    expect(focusId).equal(tagId);
+                });
+            });
+        };
+    return browser.sleep(500);
+});
+
+
+Then (/^User keyboard focus follows a clicked unfiled document.$/, async function () {
+    var unfiledDocs = browser.driver.findElements(by.xpath('//*[@class="inbox__item interactive focus-dark" or @class="inbox__item interactive focus-dark selectedItem"]'));
+    console.log((await unfiledDocs).length);
+    var middleDocIndex = ((await unfiledDocs).length)/2;
+    console.log(middleDocIndex);
+    var unfiledDocsX = browser.driver.findElement(by.xpath('//*[@class="inbox__item interactive focus-dark" or @class="inbox__item interactive focus-dark selectedItem"]['+middleDocIndex+']'));
+    unfiledDocsX.click();
+    browser.sleep(5000);
+    browser.switchTo().activeElement().sendKeys(protractor.Key.ARROW_DOWN);
+    browser.sleep(5000);
+    var unfiledDocsY = browser.driver.findElement(by.xpath('//*[@class="inbox__item interactive focus-dark" or @class="inbox__item interactive focus-dark selectedItem"]['+(middleDocIndex+1)+']'));
+    unfiledDocsY.getAttribute('id').then(function(tagId) 
+    {
+        //Get the focus element parent (which has an id to check against.)
+        browser.driver.switchTo().activeElement().findElement(by.xpath('..')).getAttribute('id').then(function(focusId) {
+            console.log('focus element (parent) id: ' + focusId + '\t clicked on element id:' + tagId);
+            expect(focusId).equal(tagId);
+        });
+    });
+    return browser.sleep(500);
+});
+
+
+Then (/^Logout from the Content$/, async function ()  {
+    browser.sleep(1000)
+    homepage.logoutUser()
+    const screenShot = await browser.takeScreenshot();
+    this.attach(screenShot, "image/png");
+    return browser.sleep(5000)
+
+});
+
+Then (/^User can verify that header with id "(.*)" has role defined as button$/, function (idVal)  {
+    var testGetHeaderElement = element(by.id(idVal));
+    testGetHeaderElement.getAttribute('role').then(function(roleValue) {
+        console.log('header id: ' + idVal + '\troleValue = ' + roleValue);
+        expect(roleValue).equal('button');
+    });    
+    return browser.sleep(500);
+});
+
+Then (/^User can verify that header with id "(.*)" has title containing the "(.*)"$/, function (idVal, textVal)  {
+    var testGetHeaderElement = element(by.id(idVal));
+    testGetHeaderElement.getAttribute('title').then(function(titleValue) {
+        console.log('header id: ' + idVal + '\ttitleValue = ' + titleValue);
+        expect(titleValue).contains(textVal);
+    });    
+    return browser.sleep(500);
+});
+
+Then (/^User expands the "(.*)" header.$/, function (idVal)  {
+    var testGetHeaderElement = element(by.id(idVal));
+    testGetHeaderElement.getAttribute('aria-expanded').then(function(expandState){
+        if(expandState == 'false') {
+            testGetHeaderElement.click();
+        }
+    });
+    return browser.sleep(500);
+});
+
+Then (/^As user selects the header with id "(.*)", verify that the aria-expanded toggles between true and false when selected.$/, function (idVal)  {
+    var testGetHeaderElement = element(by.id(idVal));
+    for(var i = 1;i<5;i++) {
+        testGetHeaderElement.getAttribute('aria-expanded').then(function(expanded) {
+            console.log('(before click)id: ' + idVal + '\t aria-expanded: ' + expanded);
+            if(expanded == 'true') {
+                testGetHeaderElement.click().then(function(toggleState) {
+                    browser.sleep(2000);
+                    testGetHeaderElement.getAttribute('aria-expanded').then(function(checkToggleAfterTrue){
+                        console.log('True branch (after click) id: ' + idVal + '\t aria-expanded: ' + checkToggleAfterTrue);
+                        expect(checkToggleAfterTrue).equal('false');    
+                    });
+                })
+            }
+            else {
+                testGetHeaderElement.click().then(function(toggleState) {
+                    browser.sleep(2000);
+                    testGetHeaderElement.getAttribute('aria-expanded').then(function(checkToggleAfterFalse){
+                        console.log('False branch (after click) id: ' + idVal + '\t aria-expanded: ' + checkToggleAfterFalse);
+                        expect(checkToggleAfterFalse).equal('true');    
+                    });
+                })
+            }
+        });        
+    }
+    return browser.sleep(500);
+});
+
+
+Then (/^Click on Key Fields section$/, async () => {
+    keyfield.clickOnKeyFieldsSection();
+    return browser.sleep(1000)
+});
+
+Then (/^Click on Add New Key Field$/, async () => {
+    keyfield.clickOnAddKeyFieldButton();
+    return browser.sleep(1000)
+});
+
+Then (/^Enter the name for new Key Field$/,  async () =>{
+    keyfield1 = auto.keyfieldName(1)
+    console.log('Keyfield Name: ' + JSON.stringify(keyfield1))
+    browser.sleep(2000);
+    for(var i =0; i<1; i++){
+    keyfield.enterNameOfNewKeyField(keyfield1[i]);
+    } 
+    return browser.sleep(1000)
+});
+
+Then (/^Click on add button to add keyfield$/, async () => {
+    keyfield.clickOnAddButton()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on Doc Type section$/, async function() {
+    contentHeaders.clickOnDocTypeSection()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on Add New Document Type$/, async function() {
+    contentHeaders.clickOnAddDocTypeButton()
+    return browser.sleep(1000)
+});
+
+Then (/^Enter new name for first Document Type and click Add$/, async () => {
+    docType1 = auto.docTypeName(1)
+    console.log('First DocType Name : ' + JSON.stringify(docType1))
+    browser.sleep(2000);
+    for(var i =0; i<1; i++){
+        contentHeaders.enterNewDocTypeName(docType1[i]);
+    } 
+    contentHeaders.clickOnAddButton()
+    return browser.sleep(1000)
+});
+
+Then (/^Search for the first doc type in search bar and click on it$/, async () => {
+    keyfield.searchForCreatedDocType(docType1[0])
+    return browser.sleep(1000)
+});
+
+Then (/^Click on the plus button to add doctypes$/, async () => {
+    auto.clickOnPlusButtonToAddDoctype()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on the plus button$/, async () => {
+    auto.clickOnPlusButtonToAddKeyfield()
+    return browser.sleep(1000)
+});
+
+Then (/^Search for created text keyfield 1 and click on checkbox$/, async () => {
+    auto.addKeyfieldToDocType1(keyfield1.toString())
+    return browser.sleep(1000)
+});
+
+Then (/^Click on Area on left side$/, async () => {
+    keyfield.clickOnAreaTab()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on plus button to add area$/, async () => {
+    keyfield.clickOnPlusAreaBox()
+    return browser.sleep(1000)
+});
+
+Then (/^Search available test area$/, async () => {
+    keyfield.searchForAvailableAreaToAdd(area)
+    return browser.sleep(1000)
+});
+
+Then (/^Click checkbox to add area$/, async () => {
+    keyfield.addFirstAreaToKeyField()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on Name Definition section$/, async () => {
+    imports.clickOnNameDefinitionSection()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on Add Definition$/, async () => {
+    imports.clickOnAddDefinition()
+    return browser.sleep(1000)
+});
+
+Then (/^Delete previous name definitions present$/, async () => {
+    imports.clickXtoDeletePreviousNameDef();
+    return browser.sleep(1000)
+});
+
+Then (/^Click on key field dropdown$/, async () => {
+    imports.clickOnKeyFieldDropdown()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on key field created from dropdown$/, async () => {
+    imports.selectKeyFieldFromDropdown(keyfield1[0])
+    return browser.sleep(1000)
+});
+
+Then (/^Click Save button$/, async () => {
+    imports.clickOnSaveButton()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on Update Existing Documents$/, async () => {
+    trans2.clickOnUpdateExistingDocButton()
+    return browser.sleep(1000)
+});
+
+Then (/^Accept the alert box by clicking ok twice$/, async () => {
+    imports.acceptAlertPopUp()
+    imports.acceptAlertPopUp()
+    return browser.sleep(1000)
+});
+
+Then (/^Accept the alert box by clicking ok$/, async () => {
+    imports.acceptAlertPopUp()
+    return browser.sleep(1000)
+});
+
+Then (/^Accept the alert box to delete$/, async () => {
+    imports.acceptAlertPopUp()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on x to delete folder level$/, async () => {
+    imports.clickOnXDeleteFolderLevel()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on Update Existing Data$/, async () => {
+    imports.clickOnUpdateExistingDataButton()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on add folder level button$/, async () => {
+    imports.clickOnAddFolderLevel()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on plus button$/, async () => {
+    imports.clickOnPlusButton()
+    return browser.sleep(1000)
+});
+
+Then (/^Select Field from definition type dropdown$/, async () => {
+    imports.selectFieldFromDefinitionTypeDropdown()
+    return browser.sleep(1000)
+});
+
+Then (/^Select Document Type from field dropdown$/, async () => {
+    imports.selectDocumentTypeFromFieldDropdown()
+    return browser.sleep(1000)
+});
+
+Then (/^Click save to save folder level$/, async () => {
+    imports.clickToSaveFolderLevel()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on Doc Type dropdown$/, async () => {
+    keyfield.clickOnDocTypeDropdown()
+    return browser.sleep(1000)
+});
+
+Then (/^Select first Doc Type from dropdown$/, async () => {
+    keyfield.selectDocTypeDropdown(docType1[0])
+    return browser.sleep(1000)
+});
+
+Then (/^Enter string value in the text keyfield$/, async () => {
+    textField1 = helperFun.randomString(5);
+    contentHeaders.enterValueInKeyfield(textField1)
+    return browser.sleep(1000)
+});
+
+Then (/^Click outside the field$/, async () => {
+    keyfield.clickOutsideTheField()
+    return browser.sleep(1000)
+});
+
+Then (/^Verify the Title of the webpage contains the name of the document defined in the DocType name definition$/, async () => {
+    browser.driver.getTitle().then(function(compareTitle) {
+        console.log(textField1);
+        expect(compareTitle).equals(textField1 + " | Etrieve | Content");
+    });
+    return browser.sleep(1000);
+});
+
+Then (/^Select first Doc Type Text from dropdown$/, async () => {
+    keyfield.selectDocTypeDropdown(docType1[0])
+    return browser.sleep(1000)
+});
+
+Then (/^User waits 45 seconds for tree clean up.$/, async () => {
+    return browser.sleep(45000)
+});
+
+Then (/^Click on Values Tab to remove the value$/, async () => {
+    inappropriateSearch.clickOnValuesTab()
+    return browser.sleep(1000)
+});
+
+
+Then (/^Click on the X glyphicon to remove the values$/, async () => {
+    contentHeaders.removeValues();
+    return browser.sleep(1000);
+});
+
+Then (/^Click on the edit button$/, async () => {
+    keyfield.clickOnEditButton()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on the delete button$/, async () => {
+    keyfield.clickOnDeleteButton()
+    return browser.sleep(1000)
+});
+
+Then (/^Search for the doc type in search bar and click on it$/, async () => {
+    keyfield.searchForCreatedDocType(docType1[0])
+    return browser.sleep(1000)
+});
+
+Then (/^Search for first keyfield and click on it$/, async () => {
+    contentHeaders.clickOnKeyfield(keyfield1.toString())
+    return browser.sleep(1000)
+});
+
+Then (/^Enter the name for new Key Field for default date 1$/,  async () =>{
+    dateKey1 = auto.keyfieldName(1)
+    console.log('Default to Date Keyfield 1: ' + JSON.stringify(dateKey1))
+    browser.sleep(2000);
+    for(var i =0; i<1; i++){
+    keyfield.enterNameOfNewKeyField(dateKey1[i]);
+    } 
+    return browser.sleep(1000)
+});
+
+Then (/^Select the data type date from dropdown for new Key Field$/, async () => {
+    keyfield.selectDateFromDataTypeDropdown()
+    return browser.sleep(1000)
+});
+
+Then (/^Click on Rules on the left side$/, async () => {
+    keyfield.clickOnRules()
+    return browser.sleep(1000)
+});
+
+Then (/^Apply the is required rule$/, async () => {
+    keyfields2.setIsRequiredRule()
+    return browser.sleep(1000)
+});
+
+Then (/^Search for created default date key field 1 and click on it$/, async () => {
+    keyfield.searchForCreatedKeyField(dateKey1[0])
+    return browser.sleep(1000)
+});
